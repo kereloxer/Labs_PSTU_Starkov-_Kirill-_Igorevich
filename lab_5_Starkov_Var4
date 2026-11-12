@@ -1,0 +1,97 @@
+#include <iostream>
+#include <iomanip>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+const int MAX_ROWS = 20;
+const int MAX_COLS = 20;
+
+// Функция заполнения двумерного массива случайными числами
+void fillArray(int arr[MAX_ROWS][MAX_COLS], int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            arr[i][j] = rand() % 90 + 10; // двузначные числа от 10 до 99
+        }
+    }
+}
+
+// Функция вывода двумерного массива на экран
+void printArray(const int arr[MAX_ROWS][MAX_COLS], int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        cout << "Строка " << setw(2) << i << ": ";
+        for (int j = 0; j < cols; j++) {
+            cout << setw(4) << arr[i][j];
+        }
+        cout << endl;
+    }
+}
+
+// Функция удаления одной строки с заданным индексом rowToDelete
+// Оставшиеся строки сдвигаются вверх (плотно), последняя заполняется 0
+void deleteRow(int arr[MAX_ROWS][MAX_COLS], int rows, int cols, int rowToDelete) {
+    if (rowToDelete < 0 || rowToDelete >= rows) {
+        return;
+    }
+    // Сдвиг строк вверх
+    for (int i = rowToDelete; i < rows - 1; i++) {
+        for (int j = 0; j < cols; j++) {
+            arr[i][j] = arr[i + 1][j];
+        }
+    }
+    // Заполнение освободившейся нижней строки нулями
+    for (int j = 0; j < cols; j++) {
+        arr[rows - 1][j] = 0;
+    }
+}
+
+// Функция исключения строк с номерами от A до B включительно
+void deleteRowsRange(int arr[MAX_ROWS][MAX_COLS], int rows, int cols, int A, int B) {
+    int count = B - A + 1;
+    for (int k = 0; k < count; k++) {
+        // Каждый раз удаляем строку на позиции A, так как следующие сдвигаются на ее место
+        deleteRow(arr, rows, cols, A);
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "Russian");
+    srand(static_cast<unsigned int>(time(nullptr)));
+
+    int matrix[MAX_ROWS][MAX_COLS];
+    int rows, cols;
+    int A, B;
+
+    cout << "Введите количество строк (от 1 до " << MAX_ROWS << "): ";
+    cin >> rows;
+    cout << "Введите количество столбцов (от 1 до " << MAX_COLS << "): ";
+    cin >> cols;
+
+    if (rows <= 0 || rows > MAX_ROWS || cols <= 0 || cols > MAX_COLS) {
+        cout << "Ошибка: некорректные размеры массива!" << endl;
+        return 1;
+    }
+
+    fillArray(matrix, rows, cols);
+
+    cout << "\nИсходный двумерный массив:\n";
+    printArray(matrix, rows, cols);
+
+    cout << "\nВведите начальный индекс удаляемых строк A (от 0 до " << rows - 1 << "): ";
+    cin >> A;
+    cout << "Введите конечный индекс удаляемых строк B (от " << A << " до " << rows - 1 << "): ";
+    cin >> B;
+
+    if (A < 0 || B >= rows || A > B) {
+        cout << "Ошибка: некорректный диапазон строк [A, B]!" << endl;
+        return 1;
+    }
+
+    deleteRowsRange(matrix, rows, cols, A, B);
+
+    cout << "\nМассив после удаления строк с " << A << " по " << B << ":\n";
+    printArray(matrix, rows, cols);
+
+    return 0;
+}
