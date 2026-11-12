@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <locale.h>
+
+#define MAX_LEN 256
+
+// Функция подсчета количества цифр в переданном слове
+int countDigits(const char* word) {
+    int count = 0;
+    for (int i = 0; word[i] != '\0'; i++) {
+        if (isdigit((unsigned char)word[i])) {
+            count++;
+        }
+    }
+    return count;
+}
+
+int main() {
+    setlocale(LC_ALL, "Russian");
+
+    char str[MAX_LEN];
+    const char* delimiters = " ,.!?;:\t\n\r";
+    int found = 0;
+
+    printf("Введите строку (не более %d символов):\n", MAX_LEN - 1);
+    if (fgets(str, MAX_LEN, stdin) == NULL) {
+        printf("Ошибка ввода строки!\n");
+        return 1;
+    }
+
+    // Удаление символа перевода строки '\n', если он присутствует
+    size_t len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n') {
+        str[len - 1] = '\0';
+    }
+
+    printf("\nСлова, содержащие ровно одну цифру:\n");
+
+    // Разбиение строки на слова (лексемы) с помощью strtok
+    char* word = strtok(str, delimiters);
+    while (word != NULL) {
+        if (countDigits(word) == 1) {
+            printf(" - %s\n", word);
+            found++;
+        }
+        word = strtok(NULL, delimiters);
+    }
+
+    if (found == 0) {
+        printf("Таких слов в строке не найдено.\n");
+    }
+
+    return 0;
+}
